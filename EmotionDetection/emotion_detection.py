@@ -15,11 +15,16 @@ def emotion_detector(text_to_analyze):
     data = { "raw_document": { "text": text_to_analyze } }
 
     response = requests.post(url, json=data, headers=header, timeout = 10)
+
+    if response.status_code == 400:
+        return {"anger": None, "disgust": None, "fear": None, "joy": None,\
+         "sadness": None, "dominant_emotion": None,}
+
     response_json = json.loads(response.text)
     emotions = response_json["emotionPredictions"][0]["emotion"]
     dominant_emotions = [k for k in emotions.keys() if emotions[k] == max(emotions.values())]
 
-    ret = {
+    return {
         "anger": emotions["anger"],
         "disgust": emotions["disgust"],
         "fear": emotions["fear"],
@@ -27,5 +32,3 @@ def emotion_detector(text_to_analyze):
         "sadness": emotions["sadness"],
         "dominant_emotion": dominant_emotions[0],
     }
-
-    return ret
